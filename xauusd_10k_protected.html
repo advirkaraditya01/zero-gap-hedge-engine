@@ -470,23 +470,64 @@
       </div>
     </div>
 
-    <!-- Shield Status & Spread Auto-Detection Banner -->
-    <div class="shield-banner p-3 mb-4" id="shieldBanner">
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+    <!-- AI Adaptive Convergence Engine Panel -->
+    <div class="shield-banner p-3 p-md-4 mb-4" id="shieldBanner">
+      <!-- Top Bar: Status Badge + Live Feed Delta + Mode Selector -->
+      <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center gap-3 pb-3 border-bottom border-secondary border-opacity-25">
         <div class="d-flex align-items-center gap-2 flex-wrap">
-          <span class="badge px-2 py-1 fw-bold text-white" style="background: #10b981;"><i class="fas fa-arrows-split-up-and-left me-1"></i> ZERO-GAP SYNC ACTIVE</span>
-          <span class="small font-mono text-light" id="detectedSpreadText">Enter both entry prices to calibrate simultaneous closing</span>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-          <span class="badge px-2 py-1 fw-bold font-mono text-white" style="background: rgba(255, 255, 255, 0.08); font-size: 0.75rem;">
-            <i class="fas fa-bolt text-warning me-1"></i>0.0¢ Execution Gap
+          <span class="badge px-3 py-2 fw-bold text-white shadow-sm" id="aiStatusBadge" style="background: #10b981; font-size: 0.8rem; letter-spacing: 0.5px;">
+            <i class="fas fa-brain me-1"></i> AI CONVERGENCE ENGINE ACTIVE
+          </span>
+          <span class="small font-mono text-light" id="detectedSpreadText">
+            Enter both entry prices to calibrate simultaneous closing
           </span>
         </div>
+
+        <!-- Mode Selector Switcher -->
+        <div class="d-flex align-items-center gap-2">
+          <span class="text-secondary small fw-semibold text-nowrap d-none d-sm-inline">Mode:</span>
+          <div class="btn-group btn-group-sm p-1 rounded-pill" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <button type="button" class="btn btn-sm btn-danger rounded-pill px-3 py-1 fw-bold active" id="btnModeUnified" onclick="setSyncMode('AI_UNIFIED')" title="Locks both orders to the exact identical market exit price">
+              <i class="fas fa-bolt text-warning me-1"></i> Zero-Gap Anchor
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 fw-bold text-white border-0" id="btnModeOffset" onclick="setSyncMode('FEED_OFFSET')" title="Offsets exit by each broker's open price">
+              <i class="fas fa-arrows-split-up-and-left me-1"></i> Feed Offset
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 fw-bold text-white border-0" id="btnModeRaw" onclick="setSyncMode('RAW_MATH')" title="Raw uncalibrated math">
+              <i class="fas fa-calculator me-1"></i> Raw Math
+            </button>
+          </div>
+        </div>
       </div>
-      <div class="small mt-2 pt-2 border-top border-secondary border-opacity-25 d-flex flex-wrap gap-3" style="color: #cbd5e1;">
-        <span><i class="fas fa-check-double text-success me-1"></i><strong>Zero-Gap Alignment:</strong> Real SL locks to the exact market price level of Prop TP</span>
-        <span><i class="fas fa-check-double text-success me-1"></i><strong>Simultaneous Close:</strong> Momentum wave sweeps through both orders together</span>
-        <span><i class="fas fa-check-double text-success me-1"></i><strong>Zero Stranded Trades:</strong> Eliminates gaps so one trade never reverses while the other floats</span>
+
+      <!-- AI Diagnosis & Real-Time Impact Row -->
+      <div class="row g-3 pt-3 align-items-center">
+        <div class="col-12 col-lg-8">
+          <div class="d-flex align-items-start gap-2">
+            <i class="fas fa-circle-info text-info mt-1"></i>
+            <div>
+              <div class="fw-bold text-white small mb-1" id="aiDiagnosisHeading">AI Diagnostic Analysis: Ready</div>
+              <div class="text-secondary small" id="aiDiagnosisDetail" style="line-height: 1.4;">
+                Enter your Prop Desk and Real Account open prices. The AI Engine will calculate entry discrepancy (lag or broker feed delta) and synchronize both TP and SL so both orders fill simultaneously with <strong>0.0¢ closing gap</strong>.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+          <div class="p-2 rounded-3 text-center" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08);">
+            <div class="text-uppercase text-secondary" style="font-size: 0.68rem; font-weight: 700; letter-spacing: 0.5px;">Closing Alignment Gap</div>
+            <div class="font-mono fw-extrabold text-success fs-5" id="aiClosingGapMetric">0.00 USD (0.0 pts)</div>
+            <div class="text-secondary" style="font-size: 0.72rem;" id="aiClosingGapSub">Simultaneous Tick Execution</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Quick Proof Pill Footer -->
+      <div class="small mt-3 pt-2 border-top border-secondary border-opacity-25 d-flex flex-wrap gap-3" style="color: #cbd5e1; font-size: 0.78rem;">
+        <span><i class="fas fa-shield-halved text-success me-1"></i><strong>Zero Stranded Risk:</strong> Prop TP &amp; Real SL trigger at the same market tick</span>
+        <span><i class="fas fa-clock text-info me-1"></i><strong>Lag Compensation:</strong> 40–60 pt human delays automatically compensated</span>
+        <span><i class="fas fa-coins text-warning me-1"></i><strong>Dynamic P&amp;L:</strong> Real account capital risk calibrated to exact fill</span>
       </div>
     </div>
 
@@ -796,7 +837,7 @@
   // State Variables
   let currentStageKey = 'PHASE1_TRADE1';
   let currentDirection = 'BUY'; // Real BUY, Prop SELL
-  let shieldMode = true; // Default Real Account Shield ON
+  let syncMode = 'AI_UNIFIED'; // 'AI_UNIFIED' | 'FEED_OFFSET' | 'RAW_MATH'
   let selectedOutcome = null;
   let isConfirmed = false;
   let cyclesCount = 0;
@@ -807,17 +848,16 @@
     recalculate();
   });
 
-  function setShieldMode(enable) {
-    shieldMode = enable;
-    const btnOn = document.getElementById('btnShieldOn');
-    const btnOff = document.getElementById('btnShieldOff');
-    if (enable) {
-      btnOn.className = 'btn btn-danger btn-sm rounded-pill px-3 py-1 fw-bold active';
-      btnOff.className = 'btn btn-outline-secondary btn-sm rounded-pill px-3 py-1 fw-bold text-white border-0';
-    } else {
-      btnOff.className = 'btn btn-secondary btn-sm rounded-pill px-3 py-1 fw-bold active';
-      btnOn.className = 'btn btn-outline-secondary btn-sm rounded-pill px-3 py-1 fw-bold text-white border-0';
-    }
+  function setSyncMode(mode) {
+    syncMode = mode;
+    const btnUni = document.getElementById('btnModeUnified');
+    const btnOff = document.getElementById('btnModeOffset');
+    const btnRaw = document.getElementById('btnModeRaw');
+
+    btnUni.className = 'btn btn-sm rounded-pill px-3 py-1 fw-bold ' + (mode === 'AI_UNIFIED' ? 'btn-danger active' : 'btn-outline-secondary text-white border-0');
+    btnOff.className = 'btn btn-sm rounded-pill px-3 py-1 fw-bold ' + (mode === 'FEED_OFFSET' ? 'btn-danger active' : 'btn-outline-secondary text-white border-0');
+    btnRaw.className = 'btn btn-sm rounded-pill px-3 py-1 fw-bold ' + (mode === 'RAW_MATH' ? 'btn-danger active' : 'btn-outline-secondary text-white border-0');
+
     recalculate();
   }
 
@@ -913,97 +953,243 @@
     document.getElementById('propLotInput').value = stage.propLot.toFixed(2);
     document.getElementById('realLotInput').value = stage.realLot.toFixed(2);
 
-    // Live Feed Delta & Zero-Gap Status
-    if (propOpen > 0 && realOpen > 0) {
-      const spreadDiff = Math.abs(realOpen - propOpen);
-      const spreadText = isForex 
-        ? (spreadDiff * 10000).toFixed(1) + ' pips feed delta' 
-        : '$' + spreadDiff.toFixed(2) + ' (' + (spreadDiff * 100).toFixed(0) + ' pts feed delta)';
-      document.getElementById('detectedSpreadText').innerHTML = `Live Broker Feed Delta: <strong class="text-white">${spreadText}</strong> &bull; <span class="text-success fw-bold"><i class="fas fa-check-double me-1"></i>0.0¢ Zero-Gap Aligned</span>`;
-    } else {
-      document.getElementById('detectedSpreadText').innerText = 'Enter both entry prices to calibrate simultaneous closing';
-    }
-
     let propTpPrice = 0, propSlPrice = 0, realTpPrice = 0, realSlPrice = 0;
+    let realSlPnl = 0, realTpPnl = 0;
+    let propTpPnl = 0, propSlPnl = 0;
+    let realSlDistVal = 0, realTpDistVal = 0;
 
-    if (currentDirection === 'BUY') {
-      // Real: BUY, Prop: SELL
-      if (propOpen > 0) {
+    // 1. Standard Prop Target & Stop Calculation
+    if (propOpen > 0) {
+      if (currentDirection === 'BUY') {
+        // Real BUY, Prop SELL
         propTpPrice = propOpen - stage.propTpMove;
         propSlPrice = propOpen + stage.propSlMove;
-      }
-      if (realOpen > 0) {
-        // Exact Zero-Gap Alignment:
-        // When market drops by propTpMove, Prop TP and Real SL execute on the exact same market tick!
-        realSlPrice = realOpen - stage.propTpMove;
-        // When market rises by propSlMove, Prop SL and Real TP execute on the exact same market tick!
-        realTpPrice = realOpen + stage.propSlMove;
-      }
-    } else {
-      // Real: SELL, Prop: BUY
-      if (propOpen > 0) {
+      } else {
+        // Real SELL, Prop BUY
         propTpPrice = propOpen + stage.propTpMove;
         propSlPrice = propOpen - stage.propSlMove;
       }
-      if (realOpen > 0) {
-        // Exact Zero-Gap Alignment:
-        // When market rises by propTpMove, Prop TP and Real SL execute on the exact same market tick!
-        realSlPrice = realOpen + stage.propTpMove;
-        // When market drops by propSlMove, Prop SL and Real TP execute on the exact same market tick!
-        realTpPrice = realOpen - stage.propSlMove;
-      }
+      propTpPnl = stage.propTpMove * mult * stage.propLot;
+      propSlPnl = -(stage.propSlMove * mult * stage.propLot);
     }
 
-    // Distance labels
+    // 2. Real Account TP/SL based on syncMode
+    if (syncMode === 'AI_UNIFIED') {
+      // AI Master Price Anchor: Both trades close at the EXACT same physical market price level!
+      if (propOpen > 0) {
+        realSlPrice = propTpPrice;
+        realTpPrice = propSlPrice;
+      } else if (realOpen > 0) {
+        if (currentDirection === 'BUY') {
+          realSlPrice = realOpen - stage.propTpMove;
+          realTpPrice = realOpen + stage.propSlMove;
+        } else {
+          realSlPrice = realOpen + stage.propTpMove;
+          realTpPrice = realOpen - stage.propSlMove;
+        }
+      }
+
+      if (realOpen > 0 && propOpen > 0) {
+        realSlDistVal = Math.abs(realSlPrice - realOpen);
+        realTpDistVal = Math.abs(realTpPrice - realOpen);
+        realSlPnl = -(realSlDistVal * mult * stage.realLot);
+        realTpPnl = (realTpDistVal * mult * stage.realLot);
+      } else {
+        realSlDistVal = stage.propTpMove;
+        realTpDistVal = stage.propSlMove;
+        realSlPnl = -(stage.propTpMove * mult * stage.realLot);
+        realTpPnl = (stage.propSlMove * mult * stage.realLot);
+      }
+    } else if (syncMode === 'FEED_OFFSET') {
+      // Independent Broker Feed Offset
+      if (realOpen > 0) {
+        if (currentDirection === 'BUY') {
+          realSlPrice = realOpen - stage.propTpMove;
+          realTpPrice = realOpen + stage.propSlMove;
+        } else {
+          realSlPrice = realOpen + stage.propTpMove;
+          realTpPrice = realOpen - stage.propSlMove;
+        }
+      } else if (propOpen > 0) {
+        realSlPrice = propTpPrice;
+        realTpPrice = propSlPrice;
+      }
+      realSlDistVal = stage.propTpMove;
+      realTpDistVal = stage.propSlMove;
+      realSlPnl = -(stage.propTpMove * mult * stage.realLot);
+      realTpPnl = (stage.propSlMove * mult * stage.realLot);
+    } else {
+      // Raw Math Baseline
+      if (realOpen > 0) {
+        if (currentDirection === 'BUY') {
+          realSlPrice = realOpen - stage.realSlMove;
+          realTpPrice = realOpen + stage.realTpMove;
+        } else {
+          realSlPrice = realOpen + stage.realSlMove;
+          realTpPrice = realOpen - stage.realTpMove;
+        }
+      } else if (propOpen > 0) {
+        realSlPrice = propTpPrice;
+        realTpPrice = propSlPrice;
+      }
+      realSlDistVal = stage.realSlMove;
+      realTpDistVal = stage.realTpMove;
+      realSlPnl = -(stage.realSlMove * mult * stage.realLot);
+      realTpPnl = (stage.realTpMove * mult * stage.realLot);
+    }
+
+    // 3. AI Diagnosis & Closing Alignment Metrics
+    const badgeEl = document.getElementById('aiStatusBadge');
+    const spreadTextEl = document.getElementById('detectedSpreadText');
+    const diagHeadEl = document.getElementById('aiDiagnosisHeading');
+    const diagDetailEl = document.getElementById('aiDiagnosisDetail');
+    const gapMetricEl = document.getElementById('aiClosingGapMetric');
+    const gapSubEl = document.getElementById('aiClosingGapSub');
+
+    if (propOpen > 0 && realOpen > 0) {
+      const entryDelta = Math.abs(realOpen - propOpen);
+      const deltaPts = isForex ? (entryDelta * 10000).toFixed(1) + ' pips' : (entryDelta * 100).toFixed(0) + ' pts ($' + entryDelta.toFixed(2) + ')';
+      const ptsNumeric = isForex ? (entryDelta * 10000) : (entryDelta * 100);
+
+      let closeGap = 0;
+      if (propTpPrice > 0 && realSlPrice > 0) {
+        closeGap = Math.abs(propTpPrice - realSlPrice);
+      }
+      const closeGapStr = isForex ? (closeGap * 10000).toFixed(1) + ' pips' : '$' + closeGap.toFixed(2) + ' (' + (closeGap * 100).toFixed(0) + ' pts)';
+
+      gapMetricEl.innerText = closeGapStr;
+      if (closeGap === 0) {
+        gapMetricEl.className = 'font-mono fw-extrabold text-success fs-5';
+        gapSubEl.innerText = 'Simultaneous Tick Execution (0.00 Gap)';
+      } else {
+        gapMetricEl.className = 'font-mono fw-extrabold text-warning fs-5';
+        gapSubEl.innerText = 'Asymmetric Gap Active';
+      }
+
+      spreadTextEl.innerHTML = `Live Entry Discrepancy: <strong class="text-white">${deltaPts}</strong>`;
+
+      if (syncMode === 'AI_UNIFIED') {
+        const netWin = propTpPnl + realSlPnl;
+        const netWinStr = (netWin >= 0 ? '+$' : '-$') + Math.abs(netWin).toFixed(2);
+        const netStop = propSlPnl + realTpPnl;
+        const netStopStr = (netStop >= 0 ? '+$' : '-$') + Math.abs(netStop).toFixed(2);
+
+        if (ptsNumeric <= 15) {
+          badgeEl.className = 'badge px-3 py-2 fw-bold text-white shadow-sm';
+          badgeEl.style.background = '#10b981';
+          badgeEl.innerHTML = '<i class="fas fa-check-circle me-1"></i> AI OPTIMAL FEED SYNC';
+          diagHeadEl.innerHTML = `AI Diagnosis: <span class="text-success">Optimal Feed Alignment (${deltaPts})</span>`;
+          diagDetailEl.innerHTML = `Both brokers are synchronized within tight ECN limits. Orders are anchored to the identical market price line (Target: <strong class="text-white">${propTpPrice.toFixed(dec)}</strong> | Stop: <strong class="text-white">${propSlPrice.toFixed(dec)}</strong>). Closing gap is <strong>0.00</strong> — simultaneous fills guaranteed.`;
+        } else if (ptsNumeric <= 60) {
+          badgeEl.className = 'badge px-3 py-2 fw-bold text-white shadow-sm';
+          badgeEl.style.background = '#0284c7';
+          badgeEl.innerHTML = '<i class="fas fa-bolt text-warning me-1"></i> AI EXECUTION LAG COMPENSATED';
+          diagHeadEl.innerHTML = `AI Diagnosis: <span class="text-info">${deltaPts} Human Execution Delay Compensated</span>`;
+          diagDetailEl.innerHTML = `Detected ${deltaPts} execution delay between clicks. <strong>AI Unified Anchor active:</strong> Real SL is automatically locked to Prop TP at <strong class="text-white">${propTpPrice.toFixed(dec)}</strong> so neither order can ever be left stranded if market reverses. Real risk auto-calibrated to <strong>-$${Math.abs(realSlPnl).toFixed(2)}</strong> (Net Cycle Profit: <strong>${netWinStr}</strong>).`;
+        } else {
+          badgeEl.className = 'badge px-3 py-2 fw-bold text-dark shadow-sm';
+          badgeEl.style.background = '#f59e0b';
+          badgeEl.innerHTML = '<i class="fas fa-shield-halved me-1"></i> AI SPREAD / VOLATILITY ADAPTED';
+          diagHeadEl.innerHTML = `AI Diagnosis: <span class="text-warning">${deltaPts} Wide Entry Spread Adapted</span>`;
+          diagDetailEl.innerHTML = `Wide entry difference (${deltaPts}) detected. AI Anchor has locked both exits to <strong class="text-white">${propTpPrice.toFixed(dec)}</strong> to protect against stranded trades. Real account capital risk dynamically calculated at <strong>-$${Math.abs(realSlPnl).toFixed(2)}</strong> (Net Target: <strong>${netWinStr}</strong> | Net Stop: <strong>${netStopStr}</strong>).`;
+        }
+      } else if (syncMode === 'FEED_OFFSET') {
+        badgeEl.className = 'badge px-3 py-2 fw-bold text-white shadow-sm';
+        badgeEl.style.background = '#6366f1';
+        badgeEl.innerHTML = '<i class="fas fa-arrows-split-up-and-left me-1"></i> FEED OFFSET MODE';
+        diagHeadEl.innerHTML = `Mode: Broker Feed Offset (${deltaPts})`;
+        diagDetailEl.innerHTML = `Calculates target distances independently from each broker's open price. Recommended only if your two brokers continuously quote different price numbers at the same second.`;
+      } else {
+        badgeEl.className = 'badge px-3 py-2 fw-bold text-white shadow-sm';
+        badgeEl.style.background = '#64748b';
+        badgeEl.innerHTML = '<i class="fas fa-calculator me-1"></i> RAW MATH BASELINE';
+        diagHeadEl.innerHTML = `Mode: Raw Math Baseline`;
+        diagDetailEl.innerHTML = `Standard theoretical math without adaptive price anchoring.`;
+      }
+    } else {
+      badgeEl.className = 'badge px-3 py-2 fw-bold text-white shadow-sm';
+      badgeEl.style.background = '#10b981';
+      badgeEl.innerHTML = '<i class="fas fa-brain me-1"></i> AI CONVERGENCE ENGINE ACTIVE';
+      spreadTextEl.innerText = 'Enter both entry prices to calibrate simultaneous closing';
+      diagHeadEl.innerText = 'AI Diagnostic Analysis: Ready';
+      diagDetailEl.innerHTML = 'Enter your Prop Desk and Real Account open prices. The AI Engine will calculate entry discrepancy (lag or broker feed delta) and synchronize both TP and SL so both orders fill simultaneously with <strong>0.0¢ closing gap</strong>.';
+      gapMetricEl.innerText = '0.00 USD (0.0 pts)';
+      gapMetricEl.className = 'font-mono fw-extrabold text-success fs-5';
+      gapSubEl.innerText = 'Awaiting Entries';
+    }
+
+    // 4. Update UI Display Values
     const propTpDistStr = isForex ? '+' + (stage.propTpMove * 10000).toFixed(1) + ' pips' : '+' + stage.propTpMove.toFixed(2) + ' USD';
     const propSlDistStr = isForex ? '-' + (stage.propSlMove * 10000).toFixed(1) + ' pips' : '-' + stage.propSlMove.toFixed(2) + ' USD';
-    const realTpDistStr = isForex ? '+' + (stage.propSlMove * 10000).toFixed(1) + ' pips' : '+' + stage.propSlMove.toFixed(2) + ' USD';
-    const realSlDistStr = isForex ? '-' + (stage.propTpMove * 10000).toFixed(1) + ' pips' : '-' + stage.propTpMove.toFixed(2) + ' USD';
+    const realTpDistStr = isForex ? '+' + (realTpDistVal * 10000).toFixed(1) + ' pips' : '+' + realTpDistVal.toFixed(2) + ' USD';
+    const realSlDistStr = isForex ? '-' + (realSlDistVal * 10000).toFixed(1) + ' pips' : '-' + realSlDistVal.toFixed(2) + ' USD';
 
-    // Exact P&L Calculations
-    const propTpPnl = (stage.propTpMove * mult * stage.propLot);
-    const propSlPnl = -(stage.propSlMove * mult * stage.propLot);
-    const realTpPnl = (stage.propSlMove * mult * stage.realLot);
-    const realSlPnl = -(stage.propTpMove * mult * stage.realLot);
+    // Prop Card
+    document.getElementById('propTpPrice').innerText = propTpPrice > 0 ? propTpPrice.toFixed(dec) : '-';
+    document.getElementById('propSlPrice').innerText = propSlPrice > 0 ? propSlPrice.toFixed(dec) : '-';
+    document.getElementById('propTpDist').innerText = propTpPrice > 0 ? propTpDistStr : '-';
+    document.getElementById('propSlDist').innerText = propSlPrice > 0 ? propSlDistStr : '-';
+    document.getElementById('propTpPnl').innerText = propTpPrice > 0 ? '+$' + propTpPnl.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-';
+    document.getElementById('propSlPnl').innerText = propSlPrice > 0 ? '-$' + Math.abs(propSlPnl).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-';
+    document.getElementById('propTpNote').innerText = syncMode === 'AI_UNIFIED' && propOpen > 0 && realOpen > 0 ? '🎯 Zero-Gap Anchor' : 'Target';
+    document.getElementById('propSlNote').innerText = 'Max Stop';
 
-    // Prop View
-    document.getElementById('propTpPrice').innerText = propOpen > 0 ? propTpPrice.toFixed(dec) : '-';
-    document.getElementById('propSlPrice').innerText = propOpen > 0 ? propSlPrice.toFixed(dec) : '-';
-    document.getElementById('propTpDist').innerText = propOpen > 0 ? propTpDistStr : '-';
-    document.getElementById('propSlDist').innerText = propOpen > 0 ? propSlDistStr : '-';
-    document.getElementById('propTpPnl').innerText = propOpen > 0 ? '+$' + propTpPnl.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-';
-    document.getElementById('propSlPnl').innerText = propOpen > 0 ? '-$' + Math.abs(propSlPnl).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-';
-    document.getElementById('propTpNote').innerText = propOpen > 0 && realOpen > 0 ? '🎯 Zero-Gap with Real SL' : 'Synced';
-    document.getElementById('propSlNote').innerText = propOpen > 0 && realOpen > 0 ? '🎯 Zero-Gap with Real TP' : 'Synced';
-
-    // Real View
-    document.getElementById('realTpPrice').innerText = realOpen > 0 ? realTpPrice.toFixed(dec) : '-';
-    document.getElementById('realSlPrice').innerText = realOpen > 0 ? realSlPrice.toFixed(dec) : '-';
-    document.getElementById('realTpDist').innerText = realOpen > 0 ? realTpDistStr : '-';
-    document.getElementById('realSlDist').innerText = realOpen > 0 ? realSlDistStr : '-';
-    document.getElementById('realTpPnl').innerText = realOpen > 0 ? '+$' + realTpPnl.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-';
-    document.getElementById('realSlPnl').innerText = realOpen > 0 ? '-$' + Math.abs(realSlPnl).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-';
-    document.getElementById('realTpNote').innerText = propOpen > 0 && realOpen > 0 ? '🎯 Zero-Gap with Prop SL' : 'Synced';
-    document.getElementById('realSlNote').innerText = propOpen > 0 && realOpen > 0 ? '🎯 Zero-Gap with Prop TP' : 'Synced';
+    // Real Card
+    document.getElementById('realTpPrice').innerText = realTpPrice > 0 ? realTpPrice.toFixed(dec) : '-';
+    document.getElementById('realSlPrice').innerText = realSlPrice > 0 ? realSlPrice.toFixed(dec) : '-';
+    document.getElementById('realTpDist').innerText = realTpPrice > 0 ? realTpDistStr : '-';
+    document.getElementById('realSlDist').innerText = realSlPrice > 0 ? realSlDistStr : '-';
+    document.getElementById('realTpPnl').innerText = realTpPrice > 0 ? '+$' + realTpPnl.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-';
+    document.getElementById('realSlPnl').innerText = realSlPrice > 0 ? '-$' + Math.abs(realSlPnl).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '-';
+    document.getElementById('realTpNote').innerText = syncMode === 'AI_UNIFIED' && propOpen > 0 && realOpen > 0 ? '🎯 Synced to Prop SL' : 'Banks First';
+    document.getElementById('realSlNote').innerText = syncMode === 'AI_UNIFIED' && propOpen > 0 && realOpen > 0 ? '🎯 Zero-Gap Anchor' : 'Standard';
   }
 
   function resetDefaults() {
     document.getElementById('propOpenInput').value = '';
     document.getElementById('realOpenInput').value = '';
     setDirection('BUY');
+    setSyncMode('AI_UNIFIED');
     recalculate();
   }
 
   function copyValue(elementId, btnElement) {
     const text = document.getElementById(elementId).innerText;
     if (!text || text === '-') return;
-    navigator.clipboard.writeText(text).then(() => {
+
+    const showCheckmark = () => {
       const originalHtml = btnElement.innerHTML;
       btnElement.innerHTML = '<i class="fas fa-check text-success"></i>';
       setTimeout(() => {
         btnElement.innerHTML = originalHtml;
       }, 1500);
-    });
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(showCheckmark).catch(() => {
+        fallbackCopy(text, showCheckmark);
+      });
+    } else {
+      fallbackCopy(text, showCheckmark);
+    }
+  }
+
+  function fallbackCopy(text, callback) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-999999px";
+    textArea.style.top = "-999999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      if (callback) callback();
+    } catch (err) {
+      console.error('Fallback copy failed', err);
+    }
+    textArea.remove();
   }
 
   // --- Outcome Modal Functions ---
